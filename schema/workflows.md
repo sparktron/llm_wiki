@@ -9,6 +9,7 @@ python tools/ingest_source.py \
   --title "Readable source title" \
   --source-id SRC-YYYY-NNNN \
   --source-type <optional_type> \
+  --auto-impacted-pages \
   --impacted-page wiki/pages/<slug>.md \
   --impacted-page wiki/pages/<slug2>.md
 ```
@@ -19,6 +20,7 @@ This workflow will:
 3. Update `wiki/index.md` sections.
 4. Append an operation record to `wiki/log.md`.
 5. Optionally list impacted pages and detect likely duplicates.
+6. Optionally auto-detect impacted topic pages from existing citations.
 
 ## Topic update flow
 1. Edit topic page in `wiki/pages/`.
@@ -48,3 +50,9 @@ python tools/lint_wiki.py --stale-days 120
 
 The lint script checks orphan pages, dead links, duplicate titles, missing sections,
 low citation density, stale pages, and likely duplicate concepts.
+
+To run the standard local verification chain:
+
+```bash
+python tools/check_all.py
+```

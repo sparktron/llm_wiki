@@ -24,6 +24,7 @@ See:
 - `python tools/append_log.py ...` — append operation log entries.
 - `python tools/lint_wiki.py` — lint structure, links, metadata, and quality checks.
 - `python tools/search_wiki.py "query"` — local markdown search.
+- `python tools/check_all.py` — run index update, lint, and unit tests in one pass.
 
 ## Quick start
 ```bash
@@ -35,4 +36,5 @@ python tools/ingest_source.py \
 
 python tools/lint_wiki.py
 python tools/search_wiki.py "example"
+python tools/check_all.py
 ```
