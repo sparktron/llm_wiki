@@ -1,77 +1,47 @@
 # Conventions
 
-## Frontmatter example
+## Folder layout
+- `raw/`: immutable source material (PDFs, notes, exports).
+- `wiki/sources/`: source summary pages (1 page per raw source).
+- `wiki/pages/`: synthesized topic pages.
+- `wiki/index.md`: canonical index.
+- `wiki/log.md`: chronological operation log.
+- `tools/`: local helper scripts.
 
-```yaml
----
-title: Example Page
-type: concept
-status: active
-created: 2026-04-06
-updated: 2026-04-06
-schema_version: 1
-source_count: 3
-confidence: medium
-tags:
-  - example
-  - knowledge-management
-aliases:
-  - Alternate Name
----
-```
+## Frontmatter
+All `wiki/sources/*.md` pages require:
+- `title`
+- `source_id`
+- `source_path`
+- `source_type` (optional but recommended)
+- `created`
+- `updated`
+
+All `wiki/pages/*.md` pages require:
+- `title`
+- `slug`
+- `created`
+- `updated`
+- `citations` (list of source IDs)
+
+Dates must use ISO format (`YYYY-MM-DD`).
 
 ## Section conventions
+Source pages should include:
+1. `## Source metadata`
+2. `## Key facts`
+3. `## Open questions`
 
-Recommended section order:
+Topic pages should include:
+1. `## Summary`
+2. `## Evidence`
+3. `## Related pages`
+4. `## Open questions`
 
-1. Summary
-2. Key points / current understanding
-3. Evidence / supporting sources
-4. Contradictions / tensions
-5. Open questions
-6. Related pages
+## Citation format
+Use source IDs inline, e.g. `(source: SRC-2026-0001)`.
 
-## Link conventions
-
-Use standard wiki links:
-
-- `[[Page Name]]`
-- `[[Page Name|Custom Label]]`
-
-Prefer canonical page names instead of creating many aliases in prose.
-
-## Contradiction formatting
-
-Use this structure when sources disagree:
-
-```md
-## Contradictions / Tensions
-- Source A claims ...
-- Source B claims ...
-- Current interpretation: ...
-- Confidence: low
-```
-
-## Source page requirements
-
-Every source page should include:
-
-- source identifier
-- raw file path
-- ingest date
-- concise summary
-- key claims or findings
-- entities mentioned
-- concepts mentioned
-- contradictions or tensions surfaced by the source
-- follow-up actions or questions
-
-## Confidence labels
-
-Use one of:
-
-- `low`
-- `medium`
-- `high`
-
-These are editorial confidence levels in the synthesis, not claims of ground truth.
+## Link style
+Use relative markdown links:
+- `../sources/<id>.md`
+- `./<slug>.md`
