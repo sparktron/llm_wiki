@@ -46,7 +46,7 @@ def safe_repo_path(raw_path: str, expected_parent: Optional[Path] = None) -> Pat
 
 
 def parse_frontmatter(text: str) -> Tuple[Dict[str, object], str]:
-    if not text.startswith("---\n"):
+    if not (text.startswith("---\n") or text.startswith("---\r\n")):
         return {}, text
     lines = text.splitlines()
     try:
@@ -106,6 +106,11 @@ def iter_markdown_files(base: Path) -> Iterable[Path]:
 
 def extract_markdown_links(text: str) -> List[str]:
     return re.findall(r"\[[^\]]+\]\(([^)]+)\)", text)
+
+
+def extract_wiki_links(text: str) -> List[str]:
+    matches = re.findall(r"\[\[([^\]|#]+)(?:#[^\]|]+)?(?:\|[^\]]+)?\]\]", text)
+    return [m.strip() for m in matches]
 
 
 def load_sources_registry() -> Dict[str, Dict[str, object]]:

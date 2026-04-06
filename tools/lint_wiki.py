@@ -5,7 +5,7 @@ from datetime import date
 from pathlib import Path
 import re
 
-from common import WIKI_DIR, WIKI_PAGES_DIR, WIKI_SOURCES_DIR, extract_markdown_links, iter_markdown_files, jaccard_similarity, read_page
+from common import WIKI_DIR, WIKI_PAGES_DIR, WIKI_SOURCES_DIR, extract_markdown_links, extract_wiki_links, iter_markdown_files, jaccard_similarity, read_page
 
 REQUIRED_SOURCE_SECTIONS = ["## Source metadata", "## Key facts", "## Open questions"]
 REQUIRED_TOPIC_SECTIONS = ["## Summary", "## Evidence", "## Related pages", "## Open questions"]
@@ -57,6 +57,13 @@ def main() -> int:
     titles: dict[str, Path] = {}
     concept_titles: list[tuple[str, Path]] = []
 
+    # Build stem map for wiki-link resolution (includes top-level wiki files)
+    stem_map: dict[str, Path] = {}
+    for f in iter_markdown_files(WIKI_DIR):
+        stem_map[f.stem] = f
+    for f in all_files:
+        stem_map[f.stem] = f
+
     linked_targets: set[Path] = set()
     for f in all_files:
         text = f.read_text(encoding="utf-8")
@@ -65,6 +72,11 @@ def main() -> int:
             if link.startswith(("http://", "https://", "#")):
                 continue
             linked_targets.add((f.parent / link).resolve())
+        for wlink in extract_wiki_links(text):
+            if wlink in stem_map:
+                linked_targets.add(stem_map[wlink].resolve())
+            else:
+                errs.append(f"broken wiki link: {f.as_posix()} -> [[{wlink}]]")
 
     for f in source_files:
         page = read_page(f)
