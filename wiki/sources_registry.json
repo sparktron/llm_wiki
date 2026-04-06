@@ -1,0 +1,12 @@
+{
+  "SRC-2026-0001": {
+    "created": "2026-04-06",
+    "notes": "",
+    "raw_path": "raw/sample_note.txt",
+    "sha256": "3c29d06c1894184c3325e58b03f20539b48e9b50368b44c4f1ec832acead3c0f",
+    "source_id": "SRC-2026-0001",
+    "source_type": "note",
+    "title": "Sample Ingest Note",
+    "updated": "2026-04-06"
+  }
+}
