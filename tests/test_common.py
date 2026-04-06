@@ -7,14 +7,14 @@ import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
 
-from common import extract_markdown_links, parse_frontmatter, safe_repo_path
+from common import REPO_ROOT, extract_markdown_links, parse_frontmatter, safe_repo_path
 
 
 class TestCommonHelpers(unittest.TestCase):
     def test_parse_frontmatter_with_list(self) -> None:
         text = """---
-title: \"Hello\"
-citations: [\"SRC-1\", \"SRC-2\"]
+title: "Hello"
+citations: ["SRC-1", "SRC-2"]
 ---
 
 Body text.
@@ -30,6 +30,12 @@ Body text.
         self.assertEqual(fm, {})
         self.assertEqual(body, text)
 
+    def test_parse_frontmatter_crlf(self) -> None:
+        text = "---\r\ntitle: \"Hello\"\r\n---\r\n\r\nBody."
+        fm, body = parse_frontmatter(text)
+        self.assertEqual(fm["title"], "Hello")
+        self.assertIn("Body.", body)
+
     def test_extract_markdown_links(self) -> None:
         text = "[a](./x.md) [b](../y.md) [external](https://example.com)"
         links = extract_markdown_links(text)
@@ -38,7 +44,7 @@ Body text.
     def test_safe_repo_path_rejects_outside_expected_parent(self) -> None:
         with tempfile.NamedTemporaryFile() as tmp:
             with self.assertRaises(ValueError):
-                safe_repo_path(tmp.name, expected_parent=Path("/workspace/llm_wiki/raw"))
+                safe_repo_path(tmp.name, expected_parent=REPO_ROOT / "raw")
 
 
 if __name__ == "__main__":
