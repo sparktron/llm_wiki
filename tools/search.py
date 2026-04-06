@@ -25,7 +25,7 @@ def main() -> int:
         if count > 0:
             first_idx = lower.find(q)
             start = max(0, first_idx - 80)
-            end = min(len(text), first_idx + 120)
+            end = min(len(text), first_idx + len(q) + 80)
             snippet = text[start:end].replace("\n", " ")
             hits.append((path.relative_to(ROOT), count, snippet))
 

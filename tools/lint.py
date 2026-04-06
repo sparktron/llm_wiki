@@ -9,7 +9,7 @@ from utils import ROOT, extract_wiki_links, safe_read_text
 
 
 WIKI_ROOT = ROOT / "wiki"
-FRONTMATTER_RE = re.compile(r"^---\n.*?\n---\n", re.DOTALL)
+FRONTMATTER_RE = re.compile(r"^---\r?\n.*?\r?\n---\r?\n", re.DOTALL)
 TITLE_RE = re.compile(r"^title:\s*(.+)$", re.MULTILINE)
 
 
@@ -31,6 +31,8 @@ def extract_title(text: str, fallback: str) -> str:
 def path_map() -> dict[str, Path]:
     mapping: dict[str, Path] = {}
     for path in all_md_files():
+        if path.stem in mapping:
+            print(f"Warning: duplicate stem '{path.stem}' — {mapping[path.stem].relative_to(ROOT)} and {path.relative_to(ROOT)}")
         mapping[path.stem] = path
     return mapping
 

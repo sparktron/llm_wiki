@@ -71,7 +71,7 @@ def main() -> int:
 
     date_str = today_iso()
     base_title = raw_file.stem.replace("_", " ").replace("-", " ").strip() or raw_file.name
-    title = " ".join(word.capitalize() for word in base_title.split())
+    title = " ".join(w if w.isupper() else w.capitalize() for w in base_title.split())
     source_slug = slugify(raw_file.stem)
     source_id = f"src-{date_str}-{source_slug}"
     checksum = sha256_file(raw_file)
@@ -79,6 +79,15 @@ def main() -> int:
     manifest_dir = ROOT / "raw" / "manifests"
     ensure_dir(manifest_dir)
     manifest_path = manifest_dir / f"{source_id}.json"
+
+    wiki_sources_dir = ROOT / "wiki" / "sources"
+    ensure_dir(wiki_sources_dir)
+    source_page_path = wiki_sources_dir / f"{source_id}.md"
+
+    if source_page_path.exists():
+        raise SystemExit(f"Source page already exists: {source_page_path}")
+    if manifest_path.exists():
+        raise SystemExit(f"Manifest already exists: {manifest_path}")
 
     manifest = {
         "source_id": source_id,
@@ -89,13 +98,6 @@ def main() -> int:
         "registered_date": date_str,
     }
     manifest_path.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
-
-    wiki_sources_dir = ROOT / "wiki" / "sources"
-    ensure_dir(wiki_sources_dir)
-    source_page_path = wiki_sources_dir / f"{source_id}.md"
-
-    if source_page_path.exists():
-        raise SystemExit(f"Source page already exists: {source_page_path}")
 
     source_page_path.write_text(
         build_source_page(title, source_id, str(raw_rel), checksum, date_str),

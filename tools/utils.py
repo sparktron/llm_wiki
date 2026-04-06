@@ -37,12 +37,6 @@ def ensure_dir(path: Path) -> None:
     path.mkdir(parents=True, exist_ok=True)
 
 
-def wiki_link_target_exists(title: str) -> bool:
-    wiki_root = ROOT / "wiki"
-    candidates = list(wiki_root.rglob(f"{title}.md"))
-    return len(candidates) > 0
-
-
 def extract_wiki_links(text: str) -> list[str]:
     matches = re.findall(r"\[\[([^\]|#]+)(?:#[^\]|]+)?(?:\|[^\]]+)?\]\]", text)
     return [m.strip() for m in matches]
