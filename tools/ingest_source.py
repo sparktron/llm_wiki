@@ -2,10 +2,11 @@ from __future__ import annotations
 
 import argparse
 import subprocess
+import sys
 from pathlib import Path
 import re
 
-from common import WIKI_PAGES_DIR, WIKI_SOURCES_DIR, iso_today, iter_markdown_files, jaccard_similarity, load_sources_registry, read_page, write_page
+from common import REPO_ROOT, WIKI_PAGES_DIR, WIKI_SOURCES_DIR, iso_today, iter_markdown_files, jaccard_similarity, load_sources_registry, read_page, write_page
 
 
 def create_or_update_source_page(source_id: str) -> Path:
@@ -26,6 +27,7 @@ def create_or_update_source_page(source_id: str) -> Path:
     fm.update(
         {
             "title": rec["title"],
+            "type": "source",
             "source_id": source_id,
             "source_path": rec["raw_path"],
             "source_type": rec.get("source_type", ""),
@@ -54,7 +56,7 @@ def detect_title_dupes(source_id: str, threshold: float = 0.75) -> list[tuple[st
 
 
 def run_script(*args: str) -> None:
-    cmd = ["python", *args]
+    cmd = [sys.executable, *[str(REPO_ROOT / a) if a.startswith("tools/") else a for a in args]]
     subprocess.run(cmd, check=True)
 
 

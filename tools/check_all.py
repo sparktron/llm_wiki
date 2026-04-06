@@ -2,6 +2,10 @@ from __future__ import annotations
 
 import argparse
 import subprocess
+import sys
+from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
 
 
 def run(cmd: list[str]) -> int:
@@ -17,11 +21,11 @@ def main() -> int:
     args = parser.parse_args()
 
     commands: list[list[str]] = [
-        ["python", "tools/update_index.py"],
-        ["python", "tools/lint_wiki.py", "--stale-days", str(args.stale_days)],
+        [sys.executable, str(REPO_ROOT / "tools" / "update_index.py")],
+        [sys.executable, str(REPO_ROOT / "tools" / "lint_wiki.py"), "--stale-days", str(args.stale_days)],
     ]
     if not args.skip_tests:
-        commands.append(["python", "-m", "unittest", "discover", "-s", "tests", "-v"])
+        commands.append([sys.executable, "-m", "unittest", "discover", "-s", str(REPO_ROOT / "tests"), "-v"])
 
     for cmd in commands:
         rc = run(cmd)
