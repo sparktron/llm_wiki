@@ -4,7 +4,7 @@ import argparse
 import hashlib
 from pathlib import Path
 
-from common import RAW_DIR, iso_today, load_sources_registry, repo_relative, safe_repo_path, save_sources_registry
+from common import RAW_DIR, iso_today, load_sources_registry, repo_relative, safe_repo_path, save_sources_registry, validate_identifier
 
 
 def sha256_file(path: Path) -> str:
@@ -25,7 +25,10 @@ def main() -> int:
     args = parser.parse_args()
 
     raw_path = safe_repo_path(args.raw_path, expected_parent=RAW_DIR)
-    source_id = args.source_id.strip()
+    try:
+        source_id = validate_identifier(args.source_id, field_name="source-id")
+    except ValueError as exc:
+        raise SystemExit(str(exc))
 
     registry = load_sources_registry()
     digest = sha256_file(raw_path)
