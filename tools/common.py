@@ -45,6 +45,17 @@ def safe_repo_path(raw_path: str, expected_parent: Optional[Path] = None) -> Pat
     return p
 
 
+def validate_identifier(value: str, *, field_name: str) -> str:
+    candidate = value.strip()
+    if not candidate:
+        raise ValueError(f"{field_name} must not be empty")
+    if "/" in candidate or "\\" in candidate:
+        raise ValueError(f"{field_name} must not contain path separators")
+    if not re.fullmatch(r"[A-Za-z0-9._-]+", candidate):
+        raise ValueError(f"{field_name} must match [A-Za-z0-9._-]+")
+    return candidate
+
+
 def parse_frontmatter(text: str) -> Tuple[Dict[str, object], str]:
     if not (text.startswith("---\n") or text.startswith("---\r\n")):
         return {}, text

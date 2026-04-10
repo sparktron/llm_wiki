@@ -7,7 +7,8 @@ import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
 
-from common import REPO_ROOT, extract_markdown_links, parse_frontmatter, safe_repo_path
+from common import REPO_ROOT, extract_markdown_links, parse_frontmatter, safe_repo_path, validate_identifier
+from lint_wiki import check_dead_links
 
 
 class TestCommonHelpers(unittest.TestCase):
@@ -45,6 +46,20 @@ Body text.
         with tempfile.NamedTemporaryFile() as tmp:
             with self.assertRaises(ValueError):
                 safe_repo_path(tmp.name, expected_parent=REPO_ROOT / "raw")
+
+    def test_check_dead_links_allows_anchors(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            source = root / "a.md"
+            target = root / "target.md"
+            source.write_text("[ok](target.md#section)", encoding="utf-8")
+            target.write_text("# Title", encoding="utf-8")
+            errs = check_dead_links(source, source.read_text(encoding="utf-8"))
+            self.assertEqual(errs, [])
+
+    def test_validate_identifier_rejects_path_traversal(self) -> None:
+        with self.assertRaises(ValueError):
+            validate_identifier("../escape", field_name="source-id")
 
 
 if __name__ == "__main__":

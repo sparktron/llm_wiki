@@ -6,7 +6,7 @@ import sys
 from pathlib import Path
 import re
 
-from common import REPO_ROOT, WIKI_PAGES_DIR, WIKI_SOURCES_DIR, iso_today, iter_markdown_files, jaccard_similarity, load_sources_registry, read_page, write_page
+from common import REPO_ROOT, WIKI_PAGES_DIR, WIKI_SOURCES_DIR, iso_today, iter_markdown_files, jaccard_similarity, load_sources_registry, read_page, validate_identifier, write_page
 
 
 def create_or_update_source_page(source_id: str) -> Path:
@@ -83,13 +83,17 @@ def main() -> int:
     parser.add_argument("--auto-impacted-pages", action="store_true")
     parser.add_argument("--details", default="source ingest")
     args = parser.parse_args()
+    try:
+        source_id = validate_identifier(args.source_id, field_name="source-id")
+    except ValueError as exc:
+        raise SystemExit(str(exc))
 
     run_script(
         "tools/register_source.py",
         "--raw-path",
         args.raw_path,
         "--source-id",
-        args.source_id,
+        source_id,
         "--title",
         args.title,
         "--source-type",
@@ -98,14 +102,14 @@ def main() -> int:
         args.notes,
     )
 
-    page_path = create_or_update_source_page(args.source_id)
+    page_path = create_or_update_source_page(source_id)
     print(f"Updated source page: {page_path}")
 
     run_script("tools/update_index.py")
 
     impacted_pages = list(args.impacted_page)
     if args.auto_impacted_pages:
-        auto_impacted = suggest_impacted_pages(args.source_id)
+        auto_impacted = suggest_impacted_pages(source_id)
         for candidate in auto_impacted:
             if candidate not in impacted_pages:
                 impacted_pages.append(candidate)
@@ -121,13 +125,13 @@ def main() -> int:
         "--details",
         args.details,
         "--source-id",
-        args.source_id,
+        source_id,
     ]
     for p in impacted_pages:
         log_cmd.extend(["--impacted-page", p])
     run_script(*log_cmd)
 
-    dupes = detect_title_dupes(args.source_id)
+    dupes = detect_title_dupes(source_id)
     if dupes:
         print("Potential duplicate sources:")
         for sid, score in dupes:

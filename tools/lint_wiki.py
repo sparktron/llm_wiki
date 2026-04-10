@@ -23,7 +23,10 @@ def check_dead_links(path: Path, text: str) -> list[str]:
     for link in extract_markdown_links(text):
         if link.startswith("http://") or link.startswith("https://") or link.startswith("#"):
             continue
-        target = (path.parent / link).resolve()
+        link_path = link.split("#", 1)[0]
+        if not link_path:
+            continue
+        target = (path.parent / link_path).resolve()
         if not target.exists():
             errs.append(f"dead link: {path.as_posix()} -> {link}")
     return errs
